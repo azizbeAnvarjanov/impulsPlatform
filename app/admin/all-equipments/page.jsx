@@ -159,9 +159,6 @@ export default function EquipmentList() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableCell>
-                {loading ? <>loadin...</> : <>Qabul sanasi</>}
-              </TableCell>
               <TableCell>Inventar nomer</TableCell>
               <TableCell>Nomi</TableCell>
               <TableCell>Filial</TableCell>
@@ -179,9 +176,6 @@ export default function EquipmentList() {
           <TableBody>
             {filteredEquipment.map((item) => (
               <TableRow key={item.id}>
-                <TableCell>
-                  {item.createdAt?.toDate().toLocaleDateString()}
-                </TableCell>
                 <TableCell>{item.inventoryNumber}</TableCell>
                 <TableCell>{item.name}</TableCell>
                 <TableCell>{item.branch}</TableCell>
