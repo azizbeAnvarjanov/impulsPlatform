@@ -15,11 +15,17 @@ import {
   TableHeader,
 } from "@/components/ui/table";
 import * as XLSX from "xlsx"; // For export functionality
-import { FileSpreadsheet, RefreshCcw } from "lucide-react";
+import {
+  FileSpreadsheet,
+  FileText,
+  PrinterCheck,
+  RefreshCcw,
+  TableProperties,
+} from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import TableSkeleton from "@/app/(components)/TableSkeleton";
-
-
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 export default function EquipmentList() {
   const [equipmentList, setEquipmentList] = useState([]);
@@ -112,10 +118,25 @@ export default function EquipmentList() {
   };
 
   const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(filteredEquipment);
+    const worksheet = XLSX.utils.json_to_sheet(
+      filteredEquipment.map((item) => ({
+        "Invertar raqami": item.inventoryNumber,
+        "Jihoz nomi": item.name,
+        Filial: item.room || item.storage, // Xona yoki sklad
+        Joylashuv: item.room || item.storage, // Xona yoki sklad
+        Turi: item.equipmentType,
+        Holati: item.equipmentStatus,
+        Soni: item.quantity,
+        "Dona narx": item.unitPrice,
+        "Ja'mi narx": item.totalPrice,
+        "Kim topshirdi": item.addedBy,
+        "Qabul qildi": item.responsiblePerson,
+        "Qabul qilingan sana": item.createdAt.toDate().toLocaleString(),
+      }))
+    );
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Equipments");
-    XLSX.writeFile(workbook, "filtered-equipment-data.xlsx");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "History");
+    XLSX.writeFile(workbook, "history.xlsx");
   };
 
   function clearFilter() {
@@ -123,15 +144,57 @@ export default function EquipmentList() {
     setSearch("");
   }
 
-  console.log(filteredEquipment);
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    const tableData = filteredEquipment.map((item) => [
+      item.inventoryNumber,
+      item.name,
+      item.branch,
+      item.room || item.storage,
+      item.equpmentType,
+      item.equipmentStatus,
+      item.quantity,
+      item.unitPrice?.toLocaleString(),
+      item.totalPrice?.toLocaleString(),
+      item.addedBy,
+      item.responsiblePerson,
+      item.createdAt.toDate().toLocaleString(),
+    ]);
+    doc.text("Barcha jihozlar", 14, 10);
+    doc.autoTable({
+      head: [
+        [
+          "Invertar raqami",
+          "Jihoz nomi",
+          "Filial",
+          "Joylashuvi",
+          "Turi",
+          "Holati",
+          "Soni",
+          "Dona narxi",
+          "Ja'mi narxi",
+          "Topshirdi",
+          "Qabul qildi",
+          "Qabul sanasi",
+        ],
+      ],
+      body: tableData,
+    });
+    doc.save("all-equipments.pdf");
+  };
+
+  const handlePrint = () => {
+    const printContent = document.getElementById("table-content").innerHTML;
+    const originalContent = document.body.innerHTML;
+    document.body.innerHTML = printContent;
+    window.print();
+    document.body.innerHTML = originalContent;
+  };
 
   return (
     <div className="p-6 space-y-4">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Equipment List</h1>
-        <Button onClick={exportToExcel}>
-          <FileSpreadsheet size="20px" /> Export to Excel
-        </Button>
       </div>
       <Input
         placeholder="Search: Name, Inventory Number, Type, or Status"
@@ -141,6 +204,15 @@ export default function EquipmentList() {
       <div className="flex space-x-4 items-center">
         <Button onClick={clearFilter}>
           <RefreshCcw />
+        </Button>
+        <Button onClick={exportToPDF}>
+          <FileText />
+        </Button>
+        <Button onClick={handlePrint}>
+          <PrinterCheck />
+        </Button>
+        <Button onClick={exportToExcel}>
+          <TableProperties size="20px" />{" "}
         </Button>
       </div>
       <div className="flex justify-between items-center">
@@ -171,47 +243,49 @@ export default function EquipmentList() {
       {loading ? (
         <TableSkeleton />
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableCell>
-                {loading ? <>loadin...</> : <>Qabul sanasi</>}
-              </TableCell>
-              <TableCell>Inventar nomer</TableCell>
-              <TableCell>Nomi</TableCell>
-              <TableCell>Filial</TableCell>
-              <TableCell>Joylashuvi</TableCell>
-              <TableCell>Turi</TableCell>
-              <TableCell>Holati</TableCell>
-              <TableCell>Soni</TableCell>
-              <TableCell>Dona narxi</TableCell>
-              <TableCell>Ja'mi narxi</TableCell>
-              <TableCell>Topshirdi</TableCell>
-              <TableCell>Qabul qildi</TableCell>
-            </TableRow>
-          </TableHeader>
-
-          <TableBody>
-            {filteredEquipment.map((item) => (
-              <TableRow key={item.id}>
+        <div id="table-content">
+          <Table>
+            <TableHeader>
+              <TableRow>
                 <TableCell>
-                  {item.createdAt?.toDate().toLocaleDateString()}
+                  {loading ? <>loadin...</> : <>Qabul sanasi</>}
                 </TableCell>
-                <TableCell>{item.inventoryNumber}</TableCell>
-                <TableCell>{item.name}</TableCell>
-                <TableCell>{item.branch}</TableCell>
-                <TableCell>{item.room || item.storage}</TableCell>
-                <TableCell>{item.equpmentType}</TableCell>
-                <TableCell>{item.equipmentStatus}</TableCell>
-                <TableCell>{item.quantity}</TableCell>
-                <TableCell>{item.unitPrice?.toLocaleString()}</TableCell>
-                <TableCell>{item.totalPrice?.toLocaleString()}</TableCell>
-                <TableCell>{item.addedBy}</TableCell>
-                <TableCell>{item.responsiblePerson}</TableCell>
+                <TableCell>Inventar nomer</TableCell>
+                <TableCell>Nomi</TableCell>
+                <TableCell>Filial</TableCell>
+                <TableCell>Joylashuvi</TableCell>
+                <TableCell>Turi</TableCell>
+                <TableCell>Holati</TableCell>
+                <TableCell>Soni</TableCell>
+                <TableCell>Dona narxi</TableCell>
+                <TableCell>Ja'mi narxi</TableCell>
+                <TableCell>Topshirdi</TableCell>
+                <TableCell>Qabul qildi</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+
+            <TableBody>
+              {filteredEquipment.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell>
+                    {item.createdAt?.toDate().toLocaleString()}
+                  </TableCell>
+                  <TableCell>{item.inventoryNumber}</TableCell>
+                  <TableCell>{item.name}</TableCell>
+                  <TableCell>{item.branch}</TableCell>
+                  <TableCell>{item.room || item.storage}</TableCell>
+                  <TableCell>{item.equpmentType}</TableCell>
+                  <TableCell>{item.equipmentStatus}</TableCell>
+                  <TableCell>{item.quantity}</TableCell>
+                  <TableCell>{item.unitPrice?.toLocaleString()}</TableCell>
+                  <TableCell>{item.totalPrice?.toLocaleString()}</TableCell>
+                  <TableCell>{item.addedBy}</TableCell>
+                  <TableCell>{item.responsiblePerson}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       )}
     </div>
   );

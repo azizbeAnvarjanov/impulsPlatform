@@ -62,12 +62,22 @@ const StoragePage = () => {
     getRoomName();
   }, [roomId]);
 
-
   return (
     <div className="p-5">
       <h1 className="text-xl font-bold">{roomName}</h1>
-      <AddEquipment setEquipment={setEquipment} branchId={branchId} id={roomId} path="rooms" />
-      <EqupmentTableMain equipment={equipment} branchId={branchId} id={roomId} path="rooms"  />
+      <AddEquipment
+        setEquipment={setEquipment}
+        branchId={branchId}
+        id={roomId}
+        path="rooms"
+        pathName={roomName}
+      />
+      <EqupmentTableMain
+        equipment={equipment}
+        branchId={branchId}
+        id={roomId}
+        path="rooms"
+      />
     </div>
   );
 };

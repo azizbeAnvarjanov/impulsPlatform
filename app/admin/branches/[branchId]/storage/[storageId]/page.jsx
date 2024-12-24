@@ -27,8 +27,6 @@ const StoragePage = () => {
   const [roomName, setRoomName] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  
-
   // Jihozlarni yuklash
   useEffect(() => {
     const fetchEquipment = async () => {
@@ -64,12 +62,22 @@ const StoragePage = () => {
     getRoomName();
   }, [storageId]);
 
-
   return (
     <div className="p-5">
       <h1 className="text-xl font-bold">{roomName}</h1>
-      <AddEquipment setEquipment={setEquipment} branchId={branchId} id={storageId} path="storages" />
-      <EqupmentTableMain equipment={equipment} branchId={branchId} id={storageId} path="storages" />
+      <AddEquipment
+        setEquipment={setEquipment}
+        branchId={branchId}
+        id={storageId}
+        path="storages"
+        pathName={roomName}
+      />
+      <EqupmentTableMain
+        equipment={equipment}
+        branchId={branchId}
+        id={storageId}
+        path="storages"
+      />
     </div>
   );
 };

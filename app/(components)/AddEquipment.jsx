@@ -21,13 +21,12 @@ import {
   collection,
   addDoc,
   serverTimestamp,
-  onSnapshot,
   getDocs,
 } from "firebase/firestore";
 import { CircleFadingPlus } from "lucide-react";
 import { toast } from "react-hot-toast";
 
-export const AddEquipment = ({ setEquipment, path, branchId, id }) => {
+export const AddEquipment = ({ setEquipment, path, branchId, id, pathName }) => {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
@@ -98,11 +97,26 @@ export const AddEquipment = ({ setEquipment, path, branchId, id }) => {
       addedBy: selectedUser,
       responsiblePerson,
     };
+
+    // Add equipment to main collection
     await addDoc(equipmentRef, {
       ...newEquipment,
       createdAt: serverTimestamp(),
     });
+
+    // Save history of the added equipment
+    const historyRef = collection(db, "history");
+    await addDoc(historyRef, {
+      ...newEquipment,
+      action: "added",
+      path: pathName,
+      createdAt: serverTimestamp(),
+    });
+
+    // Update the equipment state
     setEquipment((prev) => [...prev, newEquipment]);
+
+    // Reset form fields
     setName("");
     setInventoryNumber("");
     setEquipmentStatus("");
@@ -114,7 +128,7 @@ export const AddEquipment = ({ setEquipment, path, branchId, id }) => {
     setUnitPrice(0);
     setOpen(false);
     setLoading(false);
-    toast.success("Jihoz muvaffaqiyatli qo'shildi !")
+    toast.success("Jihoz muvaffaqiyatli qo'shildi va tarixi saqlandi!");
   };
 
   return (
