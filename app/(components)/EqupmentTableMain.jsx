@@ -12,6 +12,7 @@ import { Delete, Edit, ExpandIcon, FileSpreadsheet, Trash } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import * as XLSX from "xlsx"; // Export uchun kerak
 import {
   getFirestore,
   collection,
@@ -23,6 +24,7 @@ import { DeleteEquipmentModal } from "./DeleteEquipmentModal";
 import toast from "react-hot-toast";
 import MoveSkladModal from "./MoveSkladModal";
 import MoveRoomModal from "./MoveRoomModal";
+import Link from "next/link";
 
 const EquipmentTableMain = ({ branchId, id, path }) => {
   const [equipment, setEquipment] = useState([]);
@@ -34,6 +36,8 @@ const EquipmentTableMain = ({ branchId, id, path }) => {
     status: "",
     unit: "",
   });
+
+  
 
   const db = getFirestore();
   const collectionRef = collection(
@@ -90,9 +94,60 @@ const EquipmentTableMain = ({ branchId, id, path }) => {
     }
   }, [searchQuery, filters, equipment]);
 
+  // Ma'lumotlarni eksport qilish funksiyasi
+  const exportToExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(filteredEquipment);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Equipment");
+    XLSX.writeFile(workbook, "equipment_data.xlsx");
+  };
+
+  // Faylni import qilish funksiyasi
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setLoading(true); // Loading boshlash
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const binaryStr = e.target.result;
+      const workbook = XLSX.read(binaryStr, { type: "binary" });
+      const data = XLSX.utils.sheet_to_json(
+        workbook.Sheets[workbook.SheetNames[0]]
+      );
+
+      try {
+        for (const item of data) {
+          await addDoc(collectionRef, {
+            ...item,
+            createdAt: new Date(), // Hozirgi vaqtni qo'shish
+          });
+        }
+        toast.success("Fayl muvaffaqiyatli yuklandi!"); // Alert muvaffaqiyat
+      } catch (err) {
+        console.error("Error adding document: ", err);
+        toast.error("Xatolik yuz berdi!"); // Alert xatolik
+      } finally {
+        setLoading(false); // Loading tugadi
+      }
+    };
+    reader.readAsBinaryString(file);
+  };
+
   // Umumiy summani hisoblash
   const calculateTotalPrice = (data) => {
     return data.reduce((total, item) => total + (item.totalPrice || 0), 0);
+  };
+
+  // Valyutani formatlash
+  const formatCurrency = (amount) => {
+    if (!amount || isNaN(amount)) {
+      return "0"; // Noto‘g‘ri qiymatlar uchun
+    }
+    return new Intl.NumberFormat("uz-UZ", {
+      style: "currency",
+      currency: "UZS",
+    }).format(amount);
   };
 
   return (
@@ -174,8 +229,26 @@ const EquipmentTableMain = ({ branchId, id, path }) => {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="p-2 border border-gray-300 rounded w-full"
         />
-
-      
+        <Button
+          className="bg-blue-500 text-white px-4 py-2"
+          onClick={exportToExcel}
+        >
+          <FileSpreadsheet size="50px" />
+        </Button>
+        <Input
+          type="file"
+          onChange={handleFileUpload}
+          className="border border-gray-300 rounded p-2"
+        />
+       
+        <Link href="/Import data example.xlsx" passHref>
+          <button
+            className="px-4 py-2 mt-4 text-white bg-blue-600 rounded hover:bg-blue-700"
+            download
+          >
+            Faylni yuklab olish
+          </button>
+        </Link>
       </div>
 
       {loading && (
@@ -267,6 +340,7 @@ const EquipmentTableMain = ({ branchId, id, path }) => {
                       path={path}
                       roomId={id}
                     />
+
                     <DeleteEquipmentModal
                       branchId={branchId}
                       equipmentId={item.id}

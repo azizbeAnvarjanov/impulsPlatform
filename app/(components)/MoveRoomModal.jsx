@@ -9,7 +9,7 @@ import { db } from "@/app/firebase";
 import { DoorOpen } from "lucide-react";
 import toast from "react-hot-toast";
 
-const MoveRoomModal = ({ branchId, roomId, equipment,path }) => {
+const MoveRoomModal = ({ branchId, roomId, equipment, path }) => {
   const [open, setOpen] = useState(false);
   const [rooms, setRooms] = useState([]); // Faqat xonalar ro'yxati
   const [selectedRoom, setSelectedRoom] = useState(""); // Tanlangan xona
@@ -19,15 +19,17 @@ const MoveRoomModal = ({ branchId, roomId, equipment,path }) => {
     const fetchRooms = async () => {
       const roomsCollection = collection(doc(db, "branches", branchId), path);
       const roomsSnapshot = await getDocs(roomsCollection);
-      const roomsList = roomsSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        name: doc.data().name,
-      }));
+      const roomsList = roomsSnapshot.docs
+        .map((doc) => ({
+          id: doc.id,
+          name: doc.data().name,
+        }))
+        .filter((room) => room.id !== roomId); // Jihoz turgan xonani chiqarib tashlash
       setRooms(roomsList);
     };
 
     fetchRooms();
-  }, [branchId]);
+  }, [branchId, roomId, path]);
 
   const handleMoveEquipment = async () => {
     if (!selectedRoom) {

@@ -31,12 +31,12 @@ const AdminSidebar = () => {
         <ul className="mt-4">
           <li className="p-3 hover:bg-muted rounded-md">
             <Link href="/admin/departments">
-              <h1 className="font-bold">Bo'limlar boshqaruvi</h1>
+              <h1 className="font-bold">Bo'limlar</h1>
             </Link>
           </li>
           <li className="p-3 hover:bg-muted rounded-md">
             <Link href="/admin/users">
-              <h1 className="font-bold">Foydalanuvchilar boshqaruvi</h1>
+              <h1 className="font-bold">Foydalanuvchilar</h1>
             </Link>
           </li>
           <li className="p-3 hover:bg-muted rounded-md">

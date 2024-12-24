@@ -7,11 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Dashboard = () => {
   const [branches, setBranches] = useState([]);
-  const [branchesWithRooms, setBranchesWithRooms] = useState([]);
+  const [branchesRooms, setBranchesRooms] = useState([]);
   const [branchesWithStorages, setBranchesWithStorages] = useState([]);
-
-  console.log(branchesWithStorages.length);
-  
+  const [totalEquipment, setTotalEquipment] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const [data, setData] = useState({
     totalEquipment: 0,
@@ -92,35 +92,94 @@ const Dashboard = () => {
     };
 
     const fetchBranchesAndRooms = async () => {
-        try {
-          // Filiallarni olish
-          const branchesSnapshot = await getDocs(collection(db, "branches"));
-          const branchesData = branchesSnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-  
-          // Har bir filial uchun xonalarni olish
-          branchesData.map(async (branch) => {
-            const roomsData = await getDocs(
-                query(collection(db, `branches/${branch.id}/rooms`))
-              );
-              console.log(branch.id);
-              
-            const storageData = await getDocs(
-                query(collection(db, `branches/${branch.id}/storages`))
-              );
-              setBranchesWithStorages(storageData.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
-          });
-  
-        } catch (error) {
-          console.error("Filiallar va xonalarni olishda xato:", error);
-        }
-      };
-  
-      fetchBranchesAndRooms();
+      try {
+        // Filiallarni olish
+        const branchesSnapshot = await getDocs(collection(db, "branches"));
+        const branchesData = branchesSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        // Har bir filial uchun xonalarni olish
+        branchesData.map(async (branch) => {
+          const roomsData = await getDocs(
+            query(collection(db, `branches/${branch.id}/rooms`))
+          );
+
+          const storageData = await getDocs(
+            query(collection(db, `branches/${branch.id}/storages`))
+          );
+          setBranchesWithStorages(
+            storageData.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+          );
+          setBranchesRooms(
+            roomsData.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+          );
+        });
+      } catch (error) {
+        console.error("Filiallar va xonalarni olishda xato:", error);
+      }
+    };
+
+    fetchBranchesAndRooms();
 
     fetchData();
+  }, []);
+
+  const fetchEquipment = async () => {
+    setLoading(true);
+    const allEquipment = [];
+    const branchesSnapshot = await getDocs(collection(db, "branches"));
+
+    for (const branch of branchesSnapshot.docs) {
+      const branchId = branch.id;
+      const roomsSnapshot = await getDocs(
+        collection(db, `branches/${branchId}/rooms`)
+      );
+
+      for (const room of roomsSnapshot.docs) {
+        const roomId = room.id;
+        const equipmentSnapshot = await getDocs(
+          collection(db, `branches/${branchId}/rooms/${roomId}/equipment`)
+        );
+        equipmentSnapshot.forEach((doc) => {
+          allEquipment.push({
+            id: doc.id,
+            branch: branch.data().name || branchId,
+            room: room.data().name || roomId,
+            ...doc.data(),
+          });
+        });
+      }
+
+      const storageSnapshot = await getDocs(
+        collection(db, `branches/${branchId}/storages`)
+      );
+      for (const storage of storageSnapshot.docs) {
+        const storageId = storage.id;
+        const equipmentSnapshot = await getDocs(
+          collection(db, `branches/${branchId}/storages/${storageId}/equipment`)
+        );
+        equipmentSnapshot.forEach((doc) => {
+          allEquipment.push({
+            id: doc.id,
+            branch: branch.data().name || branchId,
+            storage: storage.data().name || storageId,
+            ...doc.data(),
+          });
+        });
+      }
+    }
+
+    setTotalEquipment(allEquipment.length);
+    setTotalPrice(
+      allEquipment.reduce((sum, item) => sum + (item.totalPrice || 0), 0)
+    );
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchEquipment();
   }, []);
 
   return (
@@ -129,61 +188,141 @@ const Dashboard = () => {
         <CardHeader>
           <CardTitle>Umumiy Jihozlar</CardTitle>
         </CardHeader>
-        <CardContent><h1 className="text-2xl font-bold">{data.totalEquipment}</h1></CardContent>
+        <CardContent>
+          {loading ? (
+            <div className="loader"></div>
+          ) : (
+            <>
+              <h1 className="text-2xl font-bold">{totalEquipment}</h1>
+            </>
+          )}
+        </CardContent>
       </Card>
       <Card>
         <CardHeader>
           <CardTitle>Umumiy Jihozlar Summasi</CardTitle>
         </CardHeader>
-        <CardContent><h1 className="text-2xl font-bold">{data.totalEquipmentSum.toLocaleString()}</h1></CardContent>
+        <CardContent>
+        {loading ? (
+            <div className="loader"></div>
+          ) : (
+            <>
+              <h1 className="text-2xl font-bold">{totalPrice.toLocaleString()}</h1>
+            </>
+          )}
+        </CardContent>
       </Card>
       <Card>
         <CardHeader>
           <CardTitle>Jihoz Turlari</CardTitle>
         </CardHeader>
-        <CardContent><h1 className="text-2xl font-bold">{data.equipmentTypes}</h1></CardContent>
+        <CardContent>
+        {loading ? (
+            <div className="loader"></div>
+          ) : (
+            <>
+              <h1 className="text-2xl font-bold">{data.equipmentTypes}</h1>
+            </>
+          )}
+        </CardContent>
       </Card>
       <Card>
         <CardHeader>
           <CardTitle>Jihoz Statuslari</CardTitle>
         </CardHeader>
-        <CardContent><h1 className="text-2xl font-bold">{data.equipmentStatuses}</h1></CardContent>
+        <CardContent>
+        {loading ? (
+            <div className="loader"></div>
+          ) : (
+            <>
+              <h1 className="text-2xl font-bold">{data.equipmentStatuses}</h1>
+            </>
+          )}
+        </CardContent>
       </Card>
       <Card>
         <CardHeader>
           <CardTitle>Jihoz O'lchov Birliklari</CardTitle>
         </CardHeader>
-        <CardContent><h1 className="text-2xl font-bold">{data.equipmentUnits}</h1></CardContent>
+        <CardContent>
+        {loading ? (
+            <div className="loader"></div>
+          ) : (
+            <>
+              <h1 className="text-2xl font-bold">{data.equipmentUnits}</h1>
+            </>
+          )}
+        </CardContent>
       </Card>
       <Card>
         <CardHeader>
           <CardTitle>Bo'limlar</CardTitle>
         </CardHeader>
-        <CardContent><h1 className="text-2xl font-bold">{data.totalDepartments}</h1></CardContent>
+        <CardContent>
+        {loading ? (
+            <div className="loader"></div>
+          ) : (
+            <>
+              <h1 className="text-2xl font-bold">{data.totalDepartments}</h1>
+            </>
+          )}
+        </CardContent>
       </Card>
       <Card>
         <CardHeader>
           <CardTitle>Foydalanuvchilar</CardTitle>
         </CardHeader>
-        <CardContent><h1 className="text-2xl font-bold">{data.totalUsers}</h1></CardContent>
+        <CardContent>
+        {loading ? (
+            <div className="loader"></div>
+          ) : (
+            <>
+              <h1 className="text-2xl font-bold">{data.totalUsers}</h1>
+            </>
+          )}
+        </CardContent>
       </Card>
       <Card>
         <CardHeader>
           <CardTitle>Xonalar</CardTitle>
         </CardHeader>
-        <CardContent><h1 className="text-2xl font-bold">{branchesWithRooms?.length}</h1></CardContent>
+        <CardContent>
+        {loading ? (
+            <div className="loader"></div>
+          ) : (
+            <>
+              <h1 className="text-2xl font-bold">{branchesRooms?.length}</h1>
+            </>
+          )}
+        </CardContent>
       </Card>
       <Card>
         <CardHeader>
           <CardTitle>Skladlar</CardTitle>
         </CardHeader>
-        <CardContent><h1 className="text-2xl font-bold">{branchesWithStorages?.length}</h1></CardContent>
+        <CardContent>
+        {loading ? (
+            <div className="loader"></div>
+          ) : (
+            <>
+              <h1 className="text-2xl font-bold">{branchesWithStorages?.length}</h1>
+            </>
+          )}
+        </CardContent>
       </Card>
       <Card>
         <CardHeader>
           <CardTitle>Filiallar</CardTitle>
         </CardHeader>
-        <CardContent><h1 className="text-2xl font-bold">{branches?.length}</h1></CardContent>
+        <CardContent>
+        {loading ? (
+            <div className="loader"></div>
+          ) : (
+            <>
+              <h1 className="text-2xl font-bold">{branches?.length}</h1>
+            </>
+          )}
+        </CardContent>
       </Card>
     </div>
   );
