@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 export default function Home() {
   return (
     <PrivateRoute>
-      <div>Main page</div>
+      <div>Main page dddd</div>
       <Button>
         <Link href="/admin">Admin</Link>
       </Button>
