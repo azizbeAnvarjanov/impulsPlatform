@@ -24,8 +24,6 @@ export default function EquipmentList() {
   const [equipmentList, setEquipmentList] = useState([]);
   const [filteredEquipment, setFilteredEquipment] = useState([]);
   const [search, setSearch] = useState("");
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
   const [totalEquipment, setTotalEquipment] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
   const [calendarOpen, setCalendarOpen] = useState({
@@ -95,41 +93,6 @@ export default function EquipmentList() {
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
     setSearch(query);
-    applyFilters(query, startDate, endDate);
-  };
-
-  const applyFilters = (query, start, end) => {
-    const filtered = equipmentList.filter((item) => {
-      const matchesQuery =
-        item.name?.toLowerCase().includes(query) ||
-        item.inventoryNumber?.toString().includes(query) ||
-        item.equipmentType?.toLowerCase().includes(query) ||
-        item.equipmentStatus?.toLowerCase().includes(query);
-
-      const matchesDate =
-        (!start || item.createdAt?.toDate() >= start) &&
-        (!end || item.createdAt?.toDate() <= end);
-
-      return matchesQuery && matchesDate;
-    });
-
-    setFilteredEquipment(filtered);
-    setTotalEquipment(filtered.length);
-    setTotalPrice(
-      filtered.reduce((sum, item) => sum + (item.totalPrice || 0), 0)
-    );
-  };
-
-  const handleDateChange = (type, date) => {
-    if (type === "start") setStartDate(date);
-    if (type === "end") setEndDate(date);
-
-    applyFilters(
-      search,
-      type === "start" ? date : startDate,
-      type === "end" ? date : endDate
-    );
-    setCalendarOpen({ ...calendarOpen, [type]: false });
   };
 
   const exportToExcel = () => {
@@ -140,8 +103,6 @@ export default function EquipmentList() {
   };
 
   function clearFilter() {
-    setEndDate(null);
-    setStartDate(null);
     fetchEquipment();
     setSearch("");
   }
@@ -160,40 +121,6 @@ export default function EquipmentList() {
         onChange={handleSearch}
       />
       <div className="flex space-x-4 items-center">
-        <div className="relative">
-          <Input
-            placeholder="Start Date"
-            onFocus={() => setCalendarOpen({ end: false, start: true })}
-            value={startDate ? startDate.toLocaleDateString() : ""}
-            readOnly
-          />
-          {calendarOpen.start && (
-            <div className="absolute bg-white border rounded-lg z-50">
-              <Calendar
-                mode="single"
-                selected={startDate}
-                onSelect={(date) => handleDateChange("start", date)}
-              />
-            </div>
-          )}
-        </div>
-        <div className="relative">
-          <Input
-            placeholder="End Date"
-            onFocus={() => setCalendarOpen({ start: false, end: true })}
-            value={endDate ? endDate.toLocaleDateString() : ""}
-            readOnly
-          />
-          {calendarOpen.end && (
-            <div className="absolute bg-white border rounded-lg z-50">
-              <Calendar
-                mode="single"
-                selected={endDate}
-                onSelect={(date) => handleDateChange("end", date)}
-              />
-            </div>
-          )}
-        </div>
         <Button onClick={() => setCalendarOpen({ start: false, end: false })}>
           Yopish
         </Button>
@@ -274,4 +201,3 @@ export default function EquipmentList() {
     </div>
   );
 }
-
