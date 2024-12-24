@@ -15,7 +15,6 @@ import {
   TableCell,
   TableHeader,
 } from "@/components/ui/table";
-import * as XLSX from "xlsx"; // For export functionality
 import { FileSpreadsheet, RefreshCcw } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import TableSkeleton from "@/app/(components)/TableSkeleton";
@@ -95,12 +94,7 @@ export default function EquipmentList() {
     setSearch(query);
   };
 
-  const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(filteredEquipment);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Equipments");
-    XLSX.writeFile(workbook, "filtered-equipment-data.xlsx");
-  };
+
 
   function clearFilter() {
     fetchEquipment();
@@ -111,9 +105,9 @@ export default function EquipmentList() {
     <div className="p-6 space-y-4">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Equipment List</h1>
-        <Button onClick={exportToExcel}>
+        {/* <Button onClick={exportToExcel}>
           <FileSpreadsheet size="20px" /> Export to Excel
-        </Button>
+        </Button> */}
       </div>
       <Input
         placeholder="Search: Name, Inventory Number, Type, or Status"
