@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <PrivateRoute>
       <Button>
-        <Link href="/admin">Admin</Link>
+        <Link href="/admin">Admin page</Link>
       </Button>
     </PrivateRoute>
   );
