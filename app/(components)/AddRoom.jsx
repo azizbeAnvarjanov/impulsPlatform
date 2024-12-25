@@ -17,37 +17,29 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { db } from "../firebase";
 
-export function AddBranch({ fetchBranches }) {
+export function AddRooom({ fetchBranches, branchId }) {
   const [open, setOpen] = useState(false);
-  const [newBranchName, setNewBranchName] = useState("");
+  const [newRoomName, setnewRoomName] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Filial qo'shish funksiyasi
-  const handleAddBranch = async (e) => {
-    e.preventDefault();
-    if (!newBranchName.trim()) {
-      toast.error("Iltimos, filial nomini kiriting.");
-      return;
-    }
-
-    const branchId = newBranchName.trim().toLowerCase().replace(/\s+/g, "-");
+  // Xona qo'shish
+  const handleAddRoom = async () => {
+    if (!newRoomName.trim()) return toast.error("Iltimos, xona nomini kiriting.");
     setLoading(true);
-
+    const roomId = newRoomName.trim().toLowerCase().replace(/\s+/g, "-");
     try {
-      // Filialni qo'shish
-      await setDoc(doc(db, "branches", branchId), {
-        name: newBranchName.trim(),
+      const roomRef = doc(db, `branches/${branchId}/rooms`, roomId);
+      await setDoc(roomRef, {
+        name: newRoomName.trim(),
+        branchId,
       });
-
+      setnewRoomName("");
       fetchBranches();
-      setNewBranchName("");
-      toast.success("Filial muvaffaqiyatli qo'shildi!");
-      setOpen(false);
     } catch (error) {
-      console.error("Filial qo'shishda xatolik:", error);
-      toast.error("Filial qo'shishda xatolik yuz berdi.");
+      console.error("Xona qo'shishda xatolik:", error);
     } finally {
       setLoading(false);
+      setOpen(false);
     }
   };
 
@@ -59,21 +51,19 @@ export function AddBranch({ fetchBranches }) {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              Filial nomini kiriting
-            </DialogTitle>
+            <DialogTitle>Xona nomini kiriting</DialogTitle>
           </DialogHeader>
           <div className="p-4 space-y-4">
             <Input
-              value={newBranchName}
-              onChange={(e) => setNewBranchName(e.target.value)}
+              value={newRoomName}
+              onChange={(e) => setnewRoomName(e.target.value)}
               placeholder="Nomi kiriting"
             />
           </div>
           <DialogFooter>
             <Button
-              disabled={loading || !newBranchName.trim()}
-              onClick={(e) => handleAddBranch(e)}
+              disabled={loading || !newRoomName.trim()}
+              onClick={handleAddRoom}
             >
               {loading ? <div className="addItemLoader"></div> : "Qo'shish"}
             </Button>

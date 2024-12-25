@@ -32,6 +32,8 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { AddRooom } from "@/app/(components)/AddRoom";
+import { AddStorage } from "@/app/(components)/AddStorage";
 
 const BranchIdPage = () => {
   const params = useParams();
@@ -67,48 +69,6 @@ const BranchIdPage = () => {
     setStorages(
       storagesData.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
     );
-  };
-
-  // Xona qo'shish
-  const handleAddRoom = async () => {
-    if (!newRoom.trim()) return toast.error("Iltimos, xona nomini kiriting.");
-    setLoading(true);
-    const roomId = newRoom.trim().toLowerCase().replace(/\s+/g, "-");
-    try {
-      const roomRef = doc(db, `branches/${branchId}/rooms`, roomId);
-      await setDoc(roomRef, {
-        name: newRoom.trim(),
-        branchId,
-      });
-      setNewRoom("");
-      fetchRoomsAndStorages();
-    } catch (error) {
-      console.error("Xona qo'shishda xatolik:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Sklad qo'shish
-  const handleAddStorage = async () => {
-    if (!newStorage.trim())
-      return toast.error("Iltimos, sklad nomini kiriting.");
-    setLoading(true);
-    const storageId = newStorage.trim().toLowerCase().replace(/\s+/g, "-");
-
-    try {
-      const storageRef = doc(db, `branches/${branchId}/storages`, storageId);
-      await setDoc(storageRef, {
-        name: newStorage.trim(),
-        branchId,
-      });
-      setNewStorage("");
-      fetchRoomsAndStorages();
-    } catch (error) {
-      console.error("Sklad qo'shishda xatolik:", error);
-    } finally {
-      setLoading(false);
-    }
   };
 
   // Xona yoki skladni tahrirlash
@@ -157,31 +117,21 @@ const BranchIdPage = () => {
       </h1>
       <div className="w-full grid grid-cols-2 gap-5">
         {/* Xonalar */}
-        <div className="">
-          <h2 className="text-xl font-semibold mb-2">Xonalar</h2>
+        <div>
+          <div className="flex gap-2 items-center gap-3 mb-4">
+            <AddRooom
+              fetchBranches={fetchRoomsAndStorages}
+              branchId={branchId}
+            />
+            <h2 className="text-xl font-semibold">Xonalar</h2>
           <Input
             type="text"
             placeholder="Xona nomi bo'yicha qidirish"
             value={searchRoom}
             onChange={(e) => setSearchRoom(e.target.value)}
-            className="border p-2 rounded-md mb-2 w-full"
-          />
-          <div className="flex gap-2">
-            <Input
-              type="text"
-              placeholder="Room name"
-              value={newRoom}
-              onChange={(e) => setNewRoom(e.target.value)}
-              className="border p-2 rounded-md mb-2 w-full"
+            className="border p-2 rounded-md w-full"
             />
-            <Button
-              onClick={handleAddRoom}
-              disabled={loading}
-              className="py-2 px-4 text-white rounded-md mb-4"
-            >
-              {loading ? "..." : <PlusCircle />}
-            </Button>
-          </div>
+            </div>
           <div className="grid grid-cols-2 gap-5">
             {rooms
               .filter((room) =>
@@ -233,15 +183,21 @@ const BranchIdPage = () => {
 
         {/* Skladlar */}
         <div>
-          <h2 className="text-xl font-semibold mb-2">Skladlar</h2>
+          <div className="flex gap-2 items-center gap-3 mb-4">
+            <AddStorage
+              fetchBranches={fetchRoomsAndStorages}
+              branchId={branchId}
+            />
+            <h2 className="text-xl font-semibold">Skladlar</h2>
           <Input
             type="text"
             placeholder="Sklad nomi bo'yicha qidirish"
             value={searchStorage}
             onChange={(e) => setSearchStorage(e.target.value)}
-            className="border p-2 rounded-md mb-2 w-full"
-          />
-          <div className="flex gap-2">
+            className="border p-2 rounded-md w-full"
+            />
+            </div>
+          {/* <div className="flex gap-2">
             <Input
               type="text"
               placeholder="Sklad name"
@@ -255,7 +211,7 @@ const BranchIdPage = () => {
             >
               {loading ? "..." : <PlusCircle />}
             </Button>
-          </div>
+          </div> */}
           <div className="grid grid-cols-2 gap-5">
             {storages
               .filter((storage) =>

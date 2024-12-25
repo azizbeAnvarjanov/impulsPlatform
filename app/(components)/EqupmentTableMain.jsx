@@ -36,8 +36,6 @@ const EquipmentTableMain = ({ branchId, id, path }) => {
     unit: "",
   });
 
-  
-
   const db = getFirestore();
   const collectionRef = collection(
     db,
@@ -159,7 +157,7 @@ const EquipmentTableMain = ({ branchId, id, path }) => {
             {calculateTotalPrice(filteredEquipment)?.toLocaleString()} so'm
           </strong>
         </div>
-        <div className="mb-4">
+        <div className="mb-4 flex gap-4 items-center">
           <select
             className="border px-4 py-2"
             value={filters.type}
@@ -217,6 +215,14 @@ const EquipmentTableMain = ({ branchId, id, path }) => {
           >
             Filtrni tozalash
           </Button>
+          <Link href="/Import data example.xlsx" passHref>
+            <Button
+              className="px-4 py-2 text-white 600 rounded hover:bg-blue-700"
+              download
+            >
+              Shablon faylni yuklab olish
+            </Button>
+          </Link>
           <br />
         </div>
       </div>
@@ -239,15 +245,6 @@ const EquipmentTableMain = ({ branchId, id, path }) => {
           onChange={handleFileUpload}
           className="border border-gray-300 rounded p-2"
         />
-       
-        <Link href="/Import data example.xlsx" passHref>
-          <button
-            className="px-4 py-2 mt-4 text-white bg-blue-600 rounded hover:bg-blue-700"
-            download
-          >
-            Faylni yuklab olish
-          </button>
-        </Link>
       </div>
 
       {loading && (

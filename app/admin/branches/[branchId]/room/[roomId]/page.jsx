@@ -64,14 +64,16 @@ const StoragePage = () => {
 
   return (
     <div className="p-5">
-      <h1 className="text-xl font-bold">{roomName}</h1>
-      <AddEquipment
-        setEquipment={setEquipment}
-        branchId={branchId}
-        id={roomId}
-        path="rooms"
-        pathName={roomName}
-      />
+      <div className="flex gap-2 items-center mb-5">
+        <AddEquipment
+          setEquipment={setEquipment}
+          branchId={branchId}
+          id={roomId}
+          path="rooms"
+          pathName={roomName}
+        />
+        <h1 className="text-xl font-bold">{roomName}</h1>
+      </div>
       <EqupmentTableMain
         equipment={equipment}
         branchId={branchId}
