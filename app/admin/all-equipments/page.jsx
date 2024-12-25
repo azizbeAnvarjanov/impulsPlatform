@@ -200,18 +200,19 @@ export default function EquipmentList() {
         placeholder="Search: Name, Inventory Number, Type, or Status"
         value={search}
         onChange={handleSearch}
+        disabled={filteredEquipment.length === 0}
       />
       <div className="flex space-x-4 items-center">
-        <Button onClick={clearFilter}>
+        <Button disabled={filteredEquipment.length === 0} onClick={clearFilter}>
           <RefreshCcw />
         </Button>
-        <Button onClick={exportToPDF}>
+        <Button disabled={filteredEquipment.length === 0} onClick={exportToPDF}>
           <FileText />
         </Button>
-        <Button onClick={handlePrint}>
+        <Button disabled={filteredEquipment.length === 0} onClick={handlePrint}>
           <PrinterCheck />
         </Button>
-        <Button onClick={exportToExcel}>
+        <Button disabled={filteredEquipment.length === 0} onClick={exportToExcel}>
           <TableProperties size="20px" />{" "}
         </Button>
       </div>

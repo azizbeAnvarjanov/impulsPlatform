@@ -15,6 +15,13 @@ import {
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
+import {
+  FileText,
+  Filter,
+  FilterX,
+  PrinterCheck,
+  TableProperties,
+} from "lucide-react";
 
 export default function HistoryPage() {
   const [history, setHistory] = useState([]);
@@ -140,46 +147,83 @@ export default function HistoryPage() {
           placeholder="Nomi yoki invertar raqami bo'yicha qidirish"
           value={searchQuery}
           onChange={handleSearch}
+          disabled={history.length === 0}
         />
 
-        <input
+        <Input
           type="date"
           value={startDate}
           onChange={(e) => setStartDate(e.target.value)}
           className="border rounded p-2"
+          disabled={history.length === 0}
         />
 
-        <input
+        <Input
           type="date"
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
           className="border rounded p-2"
+          disabled={history.length === 0}
         />
 
-        <Button onClick={handleFilterByDate}>Filtrlash</Button>
-        <Button onClick={resetFilters} variant="outline">
-          Filtrlarni tozalash
+        <Button disabled={startDate === "" && endDate === ""} onClick={handleFilterByDate}>
+          <Filter />
         </Button>
-        <Button onClick={exportToPDF}>PDF yuklab olish</Button>
-        <Button onClick={exportToExcel}>Excel yuklab olish</Button>
-        <Button onClick={handlePrint}>Print</Button>
+        <Button
+          disabled={startDate === "" && endDate === ""}
+          onClick={resetFilters}
+          variant="outline"
+        >
+          <FilterX />
+        </Button>
+        <Button disabled={history.length === 0} onClick={exportToPDF}>
+          <FileText />
+        </Button>
+        <Button disabled={history.length === 0} onClick={exportToExcel}>
+          <TableProperties />
+        </Button>
+        <Button disabled={history.length === 0} onClick={handlePrint}>
+          <PrinterCheck />
+        </Button>
       </div>
 
       <div id="table-content">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableCell><strong>Jihoz nomi</strong></TableCell>
-              <TableCell><strong>Invertar raqami</strong></TableCell>
-              <TableCell><strong>Turi</strong></TableCell>
-              <TableCell><strong>Holati</strong></TableCell>
-              <TableCell><strong>Joylashuv</strong></TableCell>
-              <TableCell><strong>Soni</strong></TableCell>
-              <TableCell><strong>Dona narxi</strong></TableCell>
-              <TableCell><strong>Umumiy narx</strong></TableCell>
-              <TableCell><strong>Kim topshirdi</strong></TableCell>
-              <TableCell><strong>Qabul qildi</strong></TableCell>
-              <TableCell><strong>Qabul qilingan sana</strong></TableCell>
+              <TableCell>
+                <strong>Jihoz nomi</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Invertar raqami</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Turi</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Holati</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Joylashuv</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Soni</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Dona narxi</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Umumiy narx</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Kim topshirdi</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Qabul qildi</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Qabul qilingan sana</strong>
+              </TableCell>
             </TableRow>
           </TableHeader>
           <TableBody>
