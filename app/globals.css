@@ -84,3 +84,17 @@ body {
   animation: l7 1s infinite;
 }
 @keyframes l7 {to{transform: rotate(.5turn)}}
+/* HTML: <div class="loader"></div> */
+.addItemLoader {
+  width: 20px;
+  aspect-ratio: 1;
+  --_c:no-repeat radial-gradient(farthest-side,#fff 80%,#0000);
+  background: 
+    var(--_c) top,
+    var(--_c) left,
+    var(--_c) right,
+    var(--_c) bottom;
+  background-size: 5px 5px;
+  animation: addItemLoader 1s infinite;
+}
+@keyframes addItemLoader {to{transform: rotate(.5turn)}}

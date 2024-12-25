@@ -169,7 +169,7 @@ export default function HistoryPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableCell><strong>ihoz nomi</strong>J</TableCell>
+              <TableCell><strong>Jihoz nomi</strong></TableCell>
               <TableCell><strong>Invertar raqami</strong></TableCell>
               <TableCell><strong>Turi</strong></TableCell>
               <TableCell><strong>Holati</strong></TableCell>

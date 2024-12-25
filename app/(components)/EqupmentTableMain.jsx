@@ -22,7 +22,6 @@ import {
 import { EditEquipmentModal } from "./EditEquipmentModal";
 import { DeleteEquipmentModal } from "./DeleteEquipmentModal";
 import toast from "react-hot-toast";
-import MoveSkladModal from "./MoveSkladModal";
 import MoveRoomModal from "./MoveRoomModal";
 import Link from "next/link";
 

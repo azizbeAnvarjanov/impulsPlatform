@@ -54,6 +54,11 @@ const AdminSidebar = () => {
               <h1 className="font-bold">Qabul tarixlari</h1>
             </Link>
           </li>
+          <li className="p-3 hover:bg-muted rounded-md">
+            <Link href="/admin/sozlamalar">
+              <h1 className="font-bold">Sozlamalar</h1>
+            </Link>
+          </li>
           <Button
             className="w-[90%] left-[50%] absolute bottom-5 -translate-x-[50%]"
             variant="destructive"
