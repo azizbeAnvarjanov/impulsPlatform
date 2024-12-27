@@ -21,7 +21,7 @@ import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
 import { Edit } from "lucide-react";
 import { toast } from "react-hot-toast";
 
-export const EditEquipmentModal = ({ equipment, branchId, id,path }) => {
+export const EditEquipmentModal = ({ equipment, branchId, id, path }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -66,7 +66,7 @@ export const EditEquipmentModal = ({ equipment, branchId, id,path }) => {
   };
 
   const updateEquipment = async () => {
-    if (!formState.name || !formState.quantity || !formState.unitPrice || !formState.inventoryNumber) {
+    if (!formState.name || !formState.quantity || !formState.unitPrice) {
       toast.error("Iltimos, barcha maydonlarni to'ldiring!");
       return;
     }
@@ -127,7 +127,9 @@ export const EditEquipmentModal = ({ equipment, branchId, id,path }) => {
             <Input
               placeholder="Invertar raqam"
               value={formState.inventoryNumber}
-              onChange={(e) => handleInputChange("inventoryNumber", e.target.value)}
+              onChange={(e) =>
+                handleInputChange("inventoryNumber", e.target.value)
+              }
             />
             <Input
               placeholder="Jihoz nomi"
@@ -148,7 +150,9 @@ export const EditEquipmentModal = ({ equipment, branchId, id,path }) => {
             />
 
             <Select
-              onValueChange={(value) => handleInputChange("responsiblePerson", value)}
+              onValueChange={(value) =>
+                handleInputChange("responsiblePerson", value)
+              }
               value={formState.responsiblePerson}
             >
               <SelectTrigger className="w-full">
@@ -179,7 +183,9 @@ export const EditEquipmentModal = ({ equipment, branchId, id,path }) => {
             </Select>
 
             <Select
-              onValueChange={(value) => handleInputChange("unitOfMeasurement", value)}
+              onValueChange={(value) =>
+                handleInputChange("unitOfMeasurement", value)
+              }
               value={formState.unitOfMeasurement}
             >
               <SelectTrigger className="w-full">
@@ -195,7 +201,9 @@ export const EditEquipmentModal = ({ equipment, branchId, id,path }) => {
             </Select>
 
             <Select
-              onValueChange={(value) => handleInputChange("equpmentType", value)}
+              onValueChange={(value) =>
+                handleInputChange("equpmentType", value)
+              }
               value={formState.equpmentType}
             >
               <SelectTrigger className="w-full">
@@ -211,7 +219,9 @@ export const EditEquipmentModal = ({ equipment, branchId, id,path }) => {
             </Select>
 
             <Select
-              onValueChange={(value) => handleInputChange("equipmentStatus", value)}
+              onValueChange={(value) =>
+                handleInputChange("equipmentStatus", value)
+              }
               value={formState.equipmentStatus}
             >
               <SelectTrigger className="w-full">
